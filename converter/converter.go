@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 
+	v3 "github.com/pb33f/libopenapi/datamodel/high/v3"
 	intconverter "github.com/sudorandom/protoc-gen-connect-openapi/internal/converter"
 	"github.com/sudorandom/protoc-gen-connect-openapi/internal/converter/options"
 	"google.golang.org/protobuf/reflect/protodesc"
@@ -180,6 +181,14 @@ func WithStreaming(streaming bool) Option {
 	}
 }
 
+// WithTrimUnusedTypes removes types that aren't referenced by a service.
+func WithTrimUnusedTypes(trimUnusedTypes bool) Option {
+	return func(g *generator) error {
+		g.options.TrimUnusedTypes = trimUnusedTypes
+		return nil
+	}
+}
+
 // WithDebug sets up the logger to emit debug entries
 func WithDebug(enabled bool) Option {
 	return func(g *generator) error {
@@ -273,6 +282,20 @@ func WithGoogleErrorDetail(enabled bool) Option {
 	}
 }
 
+// WithExcludeGoogleErrorDetailTypes excludes specific google.rpc error detail types from generation.
+// Types should be specified by their short name (e.g., "DebugInfo", "RetryInfo").
+func WithExcludeGoogleErrorDetailTypes(types ...string) Option {
+	return func(g *generator) error {
+		if g.options.ExcludeGoogleErrorDetailTypes == nil {
+			g.options.ExcludeGoogleErrorDetailTypes = make(map[string]bool)
+		}
+		for _, t := range types {
+			g.options.ExcludeGoogleErrorDetailTypes[t] = true
+		}
+		return nil
+	}
+}
+
 // WithLogger sets the logger to a given *slog.Logger instance. The default behavior will discard logs.
 func WithLogger(logger *slog.Logger) Option {
 	return func(g *generator) error {
@@ -287,3 +310,31 @@ func WithFeatures(features ...options.Feature) Option {
 		return g.options.EnableFeatures(features...)
 	}
 }
+
+// WithOptionalConnectParams makes Connect-specific headers and query parameters optional instead of required.
+func WithOptionalConnectParams(enabled bool) Option {
+	return func(g *generator) error {
+		g.options.OptionalConnectParams = enabled
+		return nil
+	}
+}
+
+type operationAnnotatorFunc struct {
+	fn func(op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation
+}
+
+func (a operationAnnotatorFunc) AnnotateOperation(_ options.Options, op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation {
+	return a.fn(op, method)
+}
+
+// WithOperationAnnotator allows customizing OpenAPI operations based on proto method descriptors.
+// The callback receives the fully built operation and the method descriptor, and should return
+// the (possibly modified) operation.
+func WithOperationAnnotator(fn func(op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation) Option {
+	return func(g *generator) error {
+		g.options.OperationAnnotator = operationAnnotatorFunc{fn: fn}
+		return nil
+	}
+}
+
+

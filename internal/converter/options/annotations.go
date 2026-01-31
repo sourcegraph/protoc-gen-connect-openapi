@@ -2,6 +2,7 @@ package options
 
 import (
 	"github.com/pb33f/libopenapi/datamodel/high/base"
+	v3 "github.com/pb33f/libopenapi/datamodel/high/v3"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
@@ -17,4 +18,8 @@ type FieldReferenceAnnotator interface {
 	// Annotate a field reference. This takes in the PARENT of the field, because with references
 	// we can only annotate on the things on the parent like the list of required attributes.
 	AnnotateFieldReference(opts Options, parent *base.Schema, desc protoreflect.FieldDescriptor) *base.Schema
+}
+
+type OperationAnnotator interface {
+	AnnotateOperation(opts Options, op *v3.Operation, desc protoreflect.MethodDescriptor) *v3.Operation
 }

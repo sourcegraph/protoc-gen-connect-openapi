@@ -27,6 +27,7 @@ func TestFromString(t *testing.T) {
 			"short-service-tags",
 			"short-operation-ids",
 			"with-google-error-detail",
+			"optional-connect-params",
 		}
 		opts, err := options.FromString(strings.Join(optionList, ","))
 		require.NoError(t, err)
@@ -45,6 +46,7 @@ func TestFromString(t *testing.T) {
 		assert.True(t, opts.ShortServiceTags)
 		assert.True(t, opts.ShortOperationIds)
 		assert.True(t, opts.WithGoogleErrorDetail)
+		assert.True(t, opts.OptionalConnectParams)
 
 		t.Run("only-googleapi-http", func(t *testing.T) {
 			opts, err := options.FromString("only-googleapi-http")
@@ -179,6 +181,12 @@ func TestFromString(t *testing.T) {
 		opts, err := options.FromString("path-prefix=/api/v1")
 		require.NoError(t, err)
 		assert.Equal(t, "/api/v1", opts.PathPrefix)
+	})
+
+	t.Run("server", func(t *testing.T) {
+		opts, err := options.FromString("server=https://api.example.com")
+		require.NoError(t, err)
+		assert.Equal(t, "https://api.example.com", opts.ServerURL)
 	})
 
 	t.Run("services", func(t *testing.T) {

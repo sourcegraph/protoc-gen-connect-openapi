@@ -309,6 +309,10 @@ func httpRuleToPathMap(opts options.Options, md protoreflect.MethodDescriptor, r
 		Codes: codeMap,
 	}
 
+	if opts.OperationAnnotator != nil {
+		op = opts.OperationAnnotator.AnnotateOperation(opts, op, md)
+	}
+
 	switch method {
 	case http.MethodGet:
 		pathItem.Get = op

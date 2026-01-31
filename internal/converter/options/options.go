@@ -69,16 +69,24 @@ type Options struct {
 	ShortOperationIds bool
 	// WithGoogleErrorDetail will add google error detail to the connect error response.
 	WithGoogleErrorDetail bool
+	// ExcludeGoogleErrorDetailTypes is a set of google.rpc error detail type names to exclude from generation.
+	// For example: "DebugInfo", "RetryInfo", etc.
+	ExcludeGoogleErrorDetailTypes map[string]bool
 	// DisableDefaultResponse disables the default 200 response.
 	DisableDefaultResponse bool
 	// EnabledFeatures is a map of enabled features.
 	EnabledFeatures map[Feature]bool
 	// AllowedVisibilities is a map of visibility strings to include. If an element has a `google.api.visibility` rule with a `restriction` that is not in this map, it will be excluded.
 	AllowedVisibilities map[string]bool
+	// OptionalConnectParams makes Connect-specific headers and query parameters (Connect-Protocol-Version, encoding) optional instead of required.
+	OptionalConnectParams bool
+	// ServerURL is the URL of the server to add to the OpenAPI spec.
+	ServerURL string
 
 	MessageAnnotator        MessageAnnotator
 	FieldAnnotator          FieldAnnotator
 	FieldReferenceAnnotator FieldReferenceAnnotator
+	OperationAnnotator      OperationAnnotator
 
 	ExtensionTypeResolver protoregistry.ExtensionTypeResolver
 
@@ -180,8 +188,23 @@ func FromString(s string) (Options, error) {
 			opts.ShortOperationIds = true
 		case param == "with-google-error-detail":
 			opts.WithGoogleErrorDetail = true
+		case strings.HasPrefix(param, "exclude-google-error-detail-types="):
+			types := strings.Split(param[len("exclude-google-error-detail-types="):], ";")
+			if opts.ExcludeGoogleErrorDetailTypes == nil {
+				opts.ExcludeGoogleErrorDetailTypes = make(map[string]bool)
+			}
+			for _, t := range types {
+				t = strings.TrimSpace(t)
+				if t != "" {
+					opts.ExcludeGoogleErrorDetailTypes[t] = true
+				}
+			}
 		case param == "disable-default-response":
 			opts.DisableDefaultResponse = true
+		case param == "optional-connect-params":
+			opts.OptionalConnectParams = true
+		case strings.HasPrefix(param, "server="):
+			opts.ServerURL = param[7:]
 		case strings.HasPrefix(param, "features="):
 			allFeatures := []Feature{}
 			for feature := range strings.SplitSeq(param[9:], ";") {

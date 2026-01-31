@@ -51,14 +51,6 @@
             }
           },
           {
-            "name": "encoding",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/encoding"
-            }
-          },
-          {
             "name": "base64",
             "in": "query",
             "schema": {
@@ -405,14 +397,6 @@
         },
         "additionalProperties": true,
         "description": "Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details."
-      },
-      "encoding": {
-        "title": "encoding",
-        "enum": [
-          "proto",
-          "json"
-        ],
-        "description": "Define which encoding or 'Message-Codec' to use"
       },
       "example_with_gnostic.HelloReply": {
         "type": "object",

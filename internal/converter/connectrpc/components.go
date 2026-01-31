@@ -12,7 +12,7 @@ import (
 
 func AddSchemas(opts options.Options, doc *v3.Document, method protoreflect.MethodDescriptor) {
 	if methodHasGet(opts, method) {
-		addConnectGetSchemas(doc.Components)
+		addConnectGetSchemas(opts, doc.Components)
 	}
 	components := doc.Components
 	if _, ok := components.Schemas.Get("connect-protocol-version"); !ok {
@@ -104,12 +104,22 @@ func AddSchemas(opts options.Options, doc *v3.Document, method protoreflect.Meth
 		if opts.WithGoogleErrorDetail {
 			googleRPCSchemas := newGoogleRPCErrorDetailSchemas()
 			for pair := googleRPCSchemas.First(); pair != nil; pair = pair.Next() {
-				components.Schemas.Set(pair.Key(), pair.Value())
-				errorDetailOptions = append(errorDetailOptions, base.CreateSchemaProxyRef("#/components/schemas/"+pair.Key()))
+				typeName := pair.Key()
+				shortName := typeName[len("google.rpc."):]
+				if opts.ExcludeGoogleErrorDetailTypes[shortName] {
+					continue
+				}
+				components.Schemas.Set(typeName, pair.Value())
+				errorDetailOptions = append(errorDetailOptions, base.CreateSchemaProxyRef("#/components/schemas/"+typeName))
 			}
 			for pair := googleRPCSchemas.First(); pair != nil; pair = pair.Next() {
+				typeName := pair.Key()
+				shortName := typeName[len("google.rpc."):]
+				if opts.ExcludeGoogleErrorDetailTypes[shortName] {
+					continue
+				}
 				// The key is the full type URL, the value is the schema reference
-				mapping.Set("type.googleapis.com/"+pair.Key(), "#/components/schemas/"+pair.Key())
+				mapping.Set("type.googleapis.com/"+typeName, "#/components/schemas/"+typeName)
 			}
 		}
 
@@ -377,16 +387,18 @@ func newGoogleRPCErrorDetailSchemas() *orderedmap.Map[string, *base.SchemaProxy]
 	return schemas
 }
 
-func addConnectGetSchemas(components *v3.Components) {
-	if _, ok := components.Schemas.Get("encoding"); !ok {
-		components.Schemas.Set("encoding", base.CreateSchemaProxy(&base.Schema{
-			Title:       "encoding",
-			Description: "Define which encoding or 'Message-Codec' to use",
-			Enum: []*yaml.Node{
-				utils.CreateStringNode("proto"),
-				utils.CreateStringNode("json"),
-			},
-		}))
+func addConnectGetSchemas(opts options.Options, components *v3.Components) {
+	if len(opts.ContentTypes) > 1 {
+		if _, ok := components.Schemas.Get("encoding"); !ok {
+			components.Schemas.Set("encoding", base.CreateSchemaProxy(&base.Schema{
+				Title:       "encoding",
+				Description: "Define which encoding or 'Message-Codec' to use",
+				Enum: []*yaml.Node{
+					utils.CreateStringNode("proto"),
+					utils.CreateStringNode("json"),
+				},
+			}))
+		}
 	}
 
 	if _, ok := components.Schemas.Get("base64"); !ok {
