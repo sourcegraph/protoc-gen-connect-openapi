@@ -273,6 +273,20 @@ func WithGoogleErrorDetail(enabled bool) Option {
 	}
 }
 
+// WithExcludeGoogleErrorDetailTypes excludes specific google.rpc error detail types from generation.
+// Types should be specified by their short name (e.g., "DebugInfo", "RetryInfo").
+func WithExcludeGoogleErrorDetailTypes(types ...string) Option {
+	return func(g *generator) error {
+		if g.options.ExcludeGoogleErrorDetailTypes == nil {
+			g.options.ExcludeGoogleErrorDetailTypes = make(map[string]bool)
+		}
+		for _, t := range types {
+			g.options.ExcludeGoogleErrorDetailTypes[t] = true
+		}
+		return nil
+	}
+}
+
 // WithLogger sets the logger to a given *slog.Logger instance. The default behavior will discard logs.
 func WithLogger(logger *slog.Logger) Option {
 	return func(g *generator) error {

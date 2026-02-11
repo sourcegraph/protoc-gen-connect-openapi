@@ -104,12 +104,22 @@ func AddSchemas(opts options.Options, doc *v3.Document, method protoreflect.Meth
 		if opts.WithGoogleErrorDetail {
 			googleRPCSchemas := newGoogleRPCErrorDetailSchemas()
 			for pair := googleRPCSchemas.First(); pair != nil; pair = pair.Next() {
-				components.Schemas.Set(pair.Key(), pair.Value())
-				errorDetailOptions = append(errorDetailOptions, base.CreateSchemaProxyRef("#/components/schemas/"+pair.Key()))
+				typeName := pair.Key()
+				shortName := typeName[len("google.rpc."):]
+				if opts.ExcludeGoogleErrorDetailTypes[shortName] {
+					continue
+				}
+				components.Schemas.Set(typeName, pair.Value())
+				errorDetailOptions = append(errorDetailOptions, base.CreateSchemaProxyRef("#/components/schemas/"+typeName))
 			}
 			for pair := googleRPCSchemas.First(); pair != nil; pair = pair.Next() {
+				typeName := pair.Key()
+				shortName := typeName[len("google.rpc."):]
+				if opts.ExcludeGoogleErrorDetailTypes[shortName] {
+					continue
+				}
 				// The key is the full type URL, the value is the schema reference
-				mapping.Set("type.googleapis.com/"+pair.Key(), "#/components/schemas/"+pair.Key())
+				mapping.Set("type.googleapis.com/"+typeName, "#/components/schemas/"+typeName)
 			}
 		}
 

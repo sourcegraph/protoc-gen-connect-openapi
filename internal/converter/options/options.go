@@ -69,6 +69,9 @@ type Options struct {
 	ShortOperationIds bool
 	// WithGoogleErrorDetail will add google error detail to the connect error response.
 	WithGoogleErrorDetail bool
+	// ExcludeGoogleErrorDetailTypes is a set of google.rpc error detail type names to exclude from generation.
+	// For example: "DebugInfo", "RetryInfo", etc.
+	ExcludeGoogleErrorDetailTypes map[string]bool
 	// DisableDefaultResponse disables the default 200 response.
 	DisableDefaultResponse bool
 	// EnabledFeatures is a map of enabled features.
@@ -180,6 +183,17 @@ func FromString(s string) (Options, error) {
 			opts.ShortOperationIds = true
 		case param == "with-google-error-detail":
 			opts.WithGoogleErrorDetail = true
+		case strings.HasPrefix(param, "exclude-google-error-detail-types="):
+			types := strings.Split(param[len("exclude-google-error-detail-types="):], ";")
+			if opts.ExcludeGoogleErrorDetailTypes == nil {
+				opts.ExcludeGoogleErrorDetailTypes = make(map[string]bool)
+			}
+			for _, t := range types {
+				t = strings.TrimSpace(t)
+				if t != "" {
+					opts.ExcludeGoogleErrorDetailTypes[t] = true
+				}
+			}
 		case param == "disable-default-response":
 			opts.DisableDefaultResponse = true
 		case strings.HasPrefix(param, "features="):

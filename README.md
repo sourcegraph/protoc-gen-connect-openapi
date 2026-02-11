@@ -183,6 +183,7 @@ protoc-gen-connect-openapi also has support for the [OpenAPI v3 annotations](htt
 | short-service-tags         | - | Use the short service name instead of the full name for OpenAPI tags.                                                                                              |
 | trim-unused-types          | - | Remove types that aren't references from any method request or response.                                                                                           |
 | with-google-error-detail   | - | Enables the generation of error details using error_details.proto from google.rpc                                                                                  |
+| exclude-google-error-detail-types | `{type1};{type2};[...]` | Semicolon-separated list of google.rpc error detail types to exclude from generation. Use short names like `DebugInfo`, `RetryInfo`, `QuotaFailure`, etc. |
 | with-proto-annotations     | - | Add protobuf type annotations to the end of descriptions so users know the protobuf type that the field converts to.                                               |
 | with-proto-names           | - | Use protobuf field names instead of the camelCase JSON names for property names.                                                                                   |
 | with-streaming             | - | Generate OpenAPI for client/server/bidirectional streaming RPCs (can be messy).                                                                                    |
