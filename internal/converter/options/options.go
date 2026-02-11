@@ -84,6 +84,7 @@ type Options struct {
 	MessageAnnotator        MessageAnnotator
 	FieldAnnotator          FieldAnnotator
 	FieldReferenceAnnotator FieldReferenceAnnotator
+	OperationAnnotator      OperationAnnotator
 
 	ExtensionTypeResolver protoregistry.ExtensionTypeResolver
 

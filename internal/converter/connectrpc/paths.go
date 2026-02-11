@@ -165,5 +165,9 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 		}
 	}
 
+	if opts.OperationAnnotator != nil {
+		op = opts.OperationAnnotator.AnnotateOperation(opts, op, method)
+	}
+
 	return op
 }

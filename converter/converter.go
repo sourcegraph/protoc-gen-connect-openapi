@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 
+	v3 "github.com/pb33f/libopenapi/datamodel/high/v3"
 	intconverter "github.com/sudorandom/protoc-gen-connect-openapi/internal/converter"
 	"github.com/sudorandom/protoc-gen-connect-openapi/internal/converter/options"
 	"google.golang.org/protobuf/reflect/protodesc"
@@ -307,5 +308,23 @@ func WithOptionalConnectParams(enabled bool) Option {
 func WithFeatures(features ...options.Feature) Option {
 	return func(g *generator) error {
 		return g.options.EnableFeatures(features...)
+	}
+}
+
+type operationAnnotatorFunc struct {
+	fn func(op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation
+}
+
+func (a operationAnnotatorFunc) AnnotateOperation(_ options.Options, op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation {
+	return a.fn(op, method)
+}
+
+// WithOperationAnnotator allows customizing OpenAPI operations based on proto method descriptors.
+// The callback receives the fully built operation and the method descriptor, and should return
+// the (possibly modified) operation.
+func WithOperationAnnotator(fn func(op *v3.Operation, method protoreflect.MethodDescriptor) *v3.Operation) Option {
+	return func(g *generator) error {
+		g.options.OperationAnnotator = operationAnnotatorFunc{fn: fn}
+		return nil
 	}
 }

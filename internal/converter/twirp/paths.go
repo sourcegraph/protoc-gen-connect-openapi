@@ -28,12 +28,18 @@ func MakePathItem(opts options.Options, method protoreflect.MethodDescriptor) *v
 }
 
 func makeOperation(opts options.Options, method protoreflect.MethodDescriptor) *v3.Operation {
-	return &v3.Operation{
+	op := &v3.Operation{
 		Tags:        []string{string(method.Parent().(protoreflect.ServiceDescriptor).FullName())},
 		OperationId: string(method.FullName()),
 		RequestBody: makeRequestBody(opts, method.Input()),
 		Responses:   makeResponses(opts, method.Output()),
 	}
+
+	if opts.OperationAnnotator != nil {
+		op = opts.OperationAnnotator.AnnotateOperation(opts, op, method)
+	}
+
+	return op
 }
 
 func makeRequestBody(opts options.Options, message protoreflect.MessageDescriptor) *v3.RequestBody {
