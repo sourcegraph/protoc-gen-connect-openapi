@@ -394,6 +394,9 @@ func initializeDoc(opts options.Options, doc *v3.Document) {
 	if doc.Components == nil {
 		doc.Components = &v3.Components{}
 	}
+	if opts.ServerURL != "" && len(doc.Servers) == 0 {
+		doc.Servers = []*v3.Server{{URL: opts.ServerURL}}
+	}
 	initializeComponents(opts, doc.Components)
 }
 

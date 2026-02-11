@@ -183,6 +183,12 @@ func TestFromString(t *testing.T) {
 		assert.Equal(t, "/api/v1", opts.PathPrefix)
 	})
 
+	t.Run("server", func(t *testing.T) {
+		opts, err := options.FromString("server=https://api.example.com")
+		require.NoError(t, err)
+		assert.Equal(t, "https://api.example.com", opts.ServerURL)
+	})
+
 	t.Run("services", func(t *testing.T) {
 		opts, err := options.FromString("services=foo.v1.FooService,services=bar.v1.BarService")
 		require.NoError(t, err)
