@@ -80,6 +80,8 @@ type Options struct {
 	AllowedVisibilities map[string]bool
 	// OptionalConnectParams makes Connect-specific headers and query parameters (Connect-Protocol-Version, encoding) optional instead of required.
 	OptionalConnectParams bool
+	// ExcludeConnectParams excludes Connect-specific headers and query parameters entirely from the generated OpenAPI spec.
+	ExcludeConnectParams bool
 	// ServerURL is the URL of the server to add to the OpenAPI spec.
 	ServerURL string
 
@@ -203,6 +205,8 @@ func FromString(s string) (Options, error) {
 			opts.DisableDefaultResponse = true
 		case param == "optional-connect-params":
 			opts.OptionalConnectParams = true
+		case param == "exclude-connect-params":
+			opts.ExcludeConnectParams = true
 		case strings.HasPrefix(param, "server="):
 			opts.ServerURL = param[7:]
 		case strings.HasPrefix(param, "features="):

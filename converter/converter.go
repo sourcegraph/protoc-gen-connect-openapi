@@ -312,6 +312,14 @@ func WithOptionalConnectParams(enabled bool) Option {
 	}
 }
 
+// WithExcludeConnectParams excludes Connect-specific headers and query parameters entirely from the generated OpenAPI spec.
+func WithExcludeConnectParams(enabled bool) Option {
+	return func(g *generator) error {
+		g.options.ExcludeConnectParams = enabled
+		return nil
+	}
+}
+
 // WithFeatures sets the features that are enabled.
 func WithFeatures(features ...options.Feature) Option {
 	return func(g *generator) error {

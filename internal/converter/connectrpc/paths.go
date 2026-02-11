@@ -93,22 +93,24 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 			isStreaming,
 		),
 	}
-	connectProtocolVersionParam := &v3.Parameter{
-		Name:   "Connect-Protocol-Version",
-		In:     "header",
-		Schema: base.CreateSchemaProxyRef("#/components/schemas/connect-protocol-version"),
-	}
-	if !opts.OptionalConnectParams {
-		connectProtocolVersionParam.Required = util.BoolPtr(true)
-	}
-	op.Parameters = append(op.Parameters,
-		connectProtocolVersionParam,
-		&v3.Parameter{
-			Name:   "Connect-Timeout-Ms",
+	if !opts.ExcludeConnectParams {
+		connectProtocolVersionParam := &v3.Parameter{
+			Name:   "Connect-Protocol-Version",
 			In:     "header",
-			Schema: base.CreateSchemaProxyRef("#/components/schemas/connect-timeout-header"),
-		},
-	)
+			Schema: base.CreateSchemaProxyRef("#/components/schemas/connect-protocol-version"),
+		}
+		if !opts.OptionalConnectParams {
+			connectProtocolVersionParam.Required = util.BoolPtr(true)
+		}
+		op.Parameters = append(op.Parameters,
+			connectProtocolVersionParam,
+			&v3.Parameter{
+				Name:   "Connect-Timeout-Ms",
+				In:     "header",
+				Schema: base.CreateSchemaProxyRef("#/components/schemas/connect-timeout-header"),
+			},
+		)
+	}
 
 	// Request parameters
 	inputId := util.FormatTypeRef(string(method.Input().FullName()))
@@ -125,34 +127,36 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 					isStreaming),
 			},
 		)
-		if len(opts.ContentTypes) > 1 {
-			encodingParam := &v3.Parameter{
-				Name:   "encoding",
-				In:     "query",
-				Schema: base.CreateSchemaProxyRef("#/components/schemas/encoding"),
+		if !opts.ExcludeConnectParams {
+			if len(opts.ContentTypes) > 1 {
+				encodingParam := &v3.Parameter{
+					Name:   "encoding",
+					In:     "query",
+					Schema: base.CreateSchemaProxyRef("#/components/schemas/encoding"),
+				}
+				if !opts.OptionalConnectParams {
+					encodingParam.Required = util.BoolPtr(true)
+				}
+				op.Parameters = append(op.Parameters, encodingParam)
 			}
-			if !opts.OptionalConnectParams {
-				encodingParam.Required = util.BoolPtr(true)
-			}
-			op.Parameters = append(op.Parameters, encodingParam)
+			op.Parameters = append(op.Parameters,
+				&v3.Parameter{
+					Name:   "base64",
+					In:     "query",
+					Schema: base.CreateSchemaProxyRef("#/components/schemas/base64"),
+				},
+				&v3.Parameter{
+					Name:   "compression",
+					In:     "query",
+					Schema: base.CreateSchemaProxyRef("#/components/schemas/compression"),
+				},
+				&v3.Parameter{
+					Name:   "connect",
+					In:     "query",
+					Schema: base.CreateSchemaProxyRef("#/components/schemas/connect"),
+				},
+			)
 		}
-		op.Parameters = append(op.Parameters,
-			&v3.Parameter{
-				Name:   "base64",
-				In:     "query",
-				Schema: base.CreateSchemaProxyRef("#/components/schemas/base64"),
-			},
-			&v3.Parameter{
-				Name:   "compression",
-				In:     "query",
-				Schema: base.CreateSchemaProxyRef("#/components/schemas/compression"),
-			},
-			&v3.Parameter{
-				Name:   "connect",
-				In:     "query",
-				Schema: base.CreateSchemaProxyRef("#/components/schemas/connect"),
-			},
-		)
 	} else {
 		op.RequestBody = &v3.RequestBody{
 			Content: util.MakeMediaTypes(
