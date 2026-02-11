@@ -181,6 +181,14 @@ func WithStreaming(streaming bool) Option {
 	}
 }
 
+// WithTrimUnusedTypes removes types that aren't referenced by a service.
+func WithTrimUnusedTypes(trimUnusedTypes bool) Option {
+	return func(g *generator) error {
+		g.options.TrimUnusedTypes = trimUnusedTypes
+		return nil
+	}
+}
+
 // WithDebug sets up the logger to emit debug entries
 func WithDebug(enabled bool) Option {
 	return func(g *generator) error {
