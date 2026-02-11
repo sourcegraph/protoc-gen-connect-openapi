@@ -27,6 +27,7 @@ func TestFromString(t *testing.T) {
 			"short-service-tags",
 			"short-operation-ids",
 			"with-google-error-detail",
+			"optional-connect-params",
 		}
 		opts, err := options.FromString(strings.Join(optionList, ","))
 		require.NoError(t, err)
@@ -45,6 +46,7 @@ func TestFromString(t *testing.T) {
 		assert.True(t, opts.ShortServiceTags)
 		assert.True(t, opts.ShortOperationIds)
 		assert.True(t, opts.WithGoogleErrorDetail)
+		assert.True(t, opts.OptionalConnectParams)
 
 		t.Run("only-googleapi-http", func(t *testing.T) {
 			opts, err := options.FromString("only-googleapi-http")

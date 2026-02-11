@@ -295,6 +295,14 @@ func WithLogger(logger *slog.Logger) Option {
 	}
 }
 
+// WithOptionalConnectParams makes Connect-specific headers and query parameters optional instead of required.
+func WithOptionalConnectParams(enabled bool) Option {
+	return func(g *generator) error {
+		g.options.OptionalConnectParams = enabled
+		return nil
+	}
+}
+
 // WithFeatures sets the features that are enabled.
 func WithFeatures(features ...options.Feature) Option {
 	return func(g *generator) error {

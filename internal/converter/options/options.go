@@ -78,6 +78,8 @@ type Options struct {
 	EnabledFeatures map[Feature]bool
 	// AllowedVisibilities is a map of visibility strings to include. If an element has a `google.api.visibility` rule with a `restriction` that is not in this map, it will be excluded.
 	AllowedVisibilities map[string]bool
+	// OptionalConnectParams makes Connect-specific headers and query parameters (Connect-Protocol-Version, encoding) optional instead of required.
+	OptionalConnectParams bool
 
 	MessageAnnotator        MessageAnnotator
 	FieldAnnotator          FieldAnnotator
@@ -196,6 +198,8 @@ func FromString(s string) (Options, error) {
 			}
 		case param == "disable-default-response":
 			opts.DisableDefaultResponse = true
+		case param == "optional-connect-params":
+			opts.OptionalConnectParams = true
 		case strings.HasPrefix(param, "features="):
 			allFeatures := []Feature{}
 			for feature := range strings.SplitSeq(param[9:], ";") {

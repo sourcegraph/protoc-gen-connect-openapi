@@ -93,13 +93,16 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 			isStreaming,
 		),
 	}
+	connectProtocolVersionParam := &v3.Parameter{
+		Name:   "Connect-Protocol-Version",
+		In:     "header",
+		Schema: base.CreateSchemaProxyRef("#/components/schemas/connect-protocol-version"),
+	}
+	if !opts.OptionalConnectParams {
+		connectProtocolVersionParam.Required = util.BoolPtr(true)
+	}
 	op.Parameters = append(op.Parameters,
-		&v3.Parameter{
-			Name:     "Connect-Protocol-Version",
-			In:       "header",
-			Required: util.BoolPtr(true),
-			Schema:   base.CreateSchemaProxyRef("#/components/schemas/connect-protocol-version"),
-		},
+		connectProtocolVersionParam,
 		&v3.Parameter{
 			Name:   "Connect-Timeout-Ms",
 			In:     "header",
@@ -123,14 +126,15 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 			},
 		)
 		if len(opts.ContentTypes) > 1 {
-			op.Parameters = append(op.Parameters,
-				&v3.Parameter{
-					Name:     "encoding",
-					In:       "query",
-					Required: util.BoolPtr(true),
-					Schema:   base.CreateSchemaProxyRef("#/components/schemas/encoding"),
-				},
-			)
+			encodingParam := &v3.Parameter{
+				Name:   "encoding",
+				In:     "query",
+				Schema: base.CreateSchemaProxyRef("#/components/schemas/encoding"),
+			}
+			if !opts.OptionalConnectParams {
+				encodingParam.Required = util.BoolPtr(true)
+			}
+			op.Parameters = append(op.Parameters, encodingParam)
 		}
 		op.Parameters = append(op.Parameters,
 			&v3.Parameter{
