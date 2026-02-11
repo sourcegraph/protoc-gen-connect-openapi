@@ -29,11 +29,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/helloworld.HelloRequest'
-        - name: encoding
-          in: query
-          required: true
-          schema:
-            $ref: '#/components/schemas/encoding'
         - name: base64
           in: query
           schema:
@@ -217,12 +212,6 @@ components:
           description: Deserialized error detail payload. The 'type' field indicates the schema. This field is for easier debugging and should not be relied upon for application logic.
       additionalProperties: true
       description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details.
-    encoding:
-      title: encoding
-      enum:
-        - proto
-        - json
-      description: Define which encoding or 'Message-Codec' to use
     helloworld.HelloReply:
       type: object
       properties:

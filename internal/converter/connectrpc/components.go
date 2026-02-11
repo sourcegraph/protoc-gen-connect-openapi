@@ -12,7 +12,7 @@ import (
 
 func AddSchemas(opts options.Options, doc *v3.Document, method protoreflect.MethodDescriptor) {
 	if methodHasGet(opts, method) {
-		addConnectGetSchemas(doc.Components)
+		addConnectGetSchemas(opts, doc.Components)
 	}
 	components := doc.Components
 	if _, ok := components.Schemas.Get("connect-protocol-version"); !ok {
@@ -377,16 +377,18 @@ func newGoogleRPCErrorDetailSchemas() *orderedmap.Map[string, *base.SchemaProxy]
 	return schemas
 }
 
-func addConnectGetSchemas(components *v3.Components) {
-	if _, ok := components.Schemas.Get("encoding"); !ok {
-		components.Schemas.Set("encoding", base.CreateSchemaProxy(&base.Schema{
-			Title:       "encoding",
-			Description: "Define which encoding or 'Message-Codec' to use",
-			Enum: []*yaml.Node{
-				utils.CreateStringNode("proto"),
-				utils.CreateStringNode("json"),
-			},
-		}))
+func addConnectGetSchemas(opts options.Options, components *v3.Components) {
+	if len(opts.ContentTypes) > 1 {
+		if _, ok := components.Schemas.Get("encoding"); !ok {
+			components.Schemas.Set("encoding", base.CreateSchemaProxy(&base.Schema{
+				Title:       "encoding",
+				Description: "Define which encoding or 'Message-Codec' to use",
+				Enum: []*yaml.Node{
+					utils.CreateStringNode("proto"),
+					utils.CreateStringNode("json"),
+				},
+			}))
+		}
 	}
 
 	if _, ok := components.Schemas.Get("base64"); !ok {

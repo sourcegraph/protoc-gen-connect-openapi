@@ -121,12 +121,18 @@ func MethodToOperation(opts options.Options, method protoreflect.MethodDescripto
 					true,
 					isStreaming),
 			},
-			&v3.Parameter{
-				Name:     "encoding",
-				In:       "query",
-				Required: util.BoolPtr(true),
-				Schema:   base.CreateSchemaProxyRef("#/components/schemas/encoding"),
-			},
+		)
+		if len(opts.ContentTypes) > 1 {
+			op.Parameters = append(op.Parameters,
+				&v3.Parameter{
+					Name:     "encoding",
+					In:       "query",
+					Required: util.BoolPtr(true),
+					Schema:   base.CreateSchemaProxyRef("#/components/schemas/encoding"),
+				},
+			)
+		}
+		op.Parameters = append(op.Parameters,
 			&v3.Parameter{
 				Name:   "base64",
 				In:     "query",
