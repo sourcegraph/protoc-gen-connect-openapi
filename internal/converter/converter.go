@@ -307,7 +307,9 @@ func appendToSpec(opts options.Options, spec *v3.Document, fd protoreflect.FileD
 	spec.Tags = append(spec.Tags, fileToTags(opts, fd)...)
 
 	// Sort
-	spec.Paths.PathItems = orderedmap.SortAlpha(spec.Paths.PathItems)
+	if !opts.PreserveRPCOrder {
+		spec.Paths.PathItems = orderedmap.SortAlpha(spec.Paths.PathItems)
+	}
 	spec.Components.Schemas = orderedmap.SortAlpha(spec.Components.Schemas)
 	spec.Components.Responses = orderedmap.SortAlpha(spec.Components.Responses)
 	spec.Components.Parameters = orderedmap.SortAlpha(spec.Components.Parameters)

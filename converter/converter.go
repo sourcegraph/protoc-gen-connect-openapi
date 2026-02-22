@@ -320,6 +320,15 @@ func WithExcludeConnectParams(enabled bool) Option {
 	}
 }
 
+// WithPreserveRPCOrder preserves the original proto file definition order for paths
+// instead of sorting them alphabetically.
+func WithPreserveRPCOrder(enabled bool) Option {
+	return func(g *generator) error {
+		g.options.PreserveRPCOrder = enabled
+		return nil
+	}
+}
+
 // WithFeatures sets the features that are enabled.
 func WithFeatures(features ...options.Feature) Option {
 	return func(g *generator) error {

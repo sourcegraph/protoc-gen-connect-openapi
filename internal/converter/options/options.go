@@ -82,6 +82,8 @@ type Options struct {
 	OptionalConnectParams bool
 	// ExcludeConnectParams excludes Connect-specific headers and query parameters entirely from the generated OpenAPI spec.
 	ExcludeConnectParams bool
+	// PreserveRPCOrder preserves the original proto file definition order for paths instead of sorting alphabetically.
+	PreserveRPCOrder bool
 	// ServerURL is the URL of the server to add to the OpenAPI spec.
 	ServerURL string
 
